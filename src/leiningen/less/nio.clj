@@ -191,7 +191,9 @@
   (let [^WatchService watcher (.newWatchService (FileSystems/getDefault))]
     (println "Found {less} source paths: ")
     (doseq [path paths
-            child (descendents directory? path)]
+            child (descendents directory? (if (less? path)
+                                            (.getParent path)
+                                            path))]
       (println (format "  %s" (fstr project child)))
       (.register ^Path child watcher watch-opts-cdm watch-modifiers))
     (println "Watching for changes...")
