@@ -178,12 +178,14 @@
     (->>
       (for [^Path src-path src-paths
             ^Path src (remove private? (filter less? (descendents src-path)))]
-        (let [dst ^Path (.resolve target-path (.relativize src-path src))
+        (let [dst-filename (if (less? src-path)
+                             (str (.getFileName src-path))
+                             (.relativize src-path src))
+              dst ^Path (.resolve target-path dst-filename)
               [_ fname ext] (re-matches #"^(.+)[.]([^.]+)$" (.toString dst))
               dst (.resolve (.getParent dst) (format "%s.%s" fname "css"))]
           (when fname {:src src :dst dst})))
-      (remove empty?)
-      )))
+      (remove empty?))))
 
 (defn watch-resources [project paths callback]
   (let [^WatchService watcher (.newWatchService (FileSystems/getDefault))]
